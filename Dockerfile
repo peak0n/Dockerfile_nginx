@@ -49,36 +49,10 @@ RUN ln -s /usr/bin/php82 /usr/bin/php
 USER nobody
 
 # Add application
-##COPY --chown=nobody html/ /var/www/html/
-
-# Set the working directory
-RUN mkdir /var/www/html/moodle
-WORKDIR /var/www/html/moodle
-
-# Download and install Moodle
-RUN curl -L https://download.moodle.org/download.php/direct/stable402/moodle-latest-402.tgz | tar zxvf - --strip-components 1
-
-# Create a Moodle data directory
-RUN mkdir /var/www/html/moodledata
-RUN chmod 0777 /var/www/html/moodledata
+COPY --chown=nobody html/ /var/www/html/
 
 # Expose the port nginx is reachable on
 EXPOSE 8080
-
-
-# Create a directory for scripts outside of /tmp
-USER root
-RUN mkdir /scripts
-
-# Copy the entrypoint script into the container
-COPY entrypoint.sh /scripts/entrypoint.sh
-
-# Make the script executable
-RUN chmod +x /scripts/entrypoint.sh
-
-# Set the entrypoint command
-ENTRYPOINT ["/scripts/entrypoint.sh"]
-
 
 # Let supervisord start nginx & php-fpm
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
